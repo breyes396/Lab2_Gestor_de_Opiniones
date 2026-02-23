@@ -1,0 +1,735 @@
+{
+	"info": {
+		"_postman_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+		"name": "Gestor de Opiniones - Lab2",
+		"description": "Colección completa para probar API de autenticación, perfil, publicaciones y comentarios",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "1. Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.user && response.user.id) {",
+									"        pm.environment.set('userId', response.user.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Juan",
+									"type": "text"
+								},
+								{
+									"key": "surname",
+									"value": "Pérez",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "juanperez",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "juan.perez@example.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "Password123",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "12345678",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"register"
+							]
+						},
+						"description": "Registra un nuevo usuario. Guarda el userId en variables de entorno."
+					},
+					"response": []
+				},
+				{
+					"name": "2. Verify Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"PASTE_TOKEN_FROM_EMAIL_HERE\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/verify-email",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"verify-email"
+							]
+						},
+						"description": "Verifica el email usando el token recibido por correo. Necesitas copiar el token del email."
+					},
+					"response": []
+				},
+				{
+					"name": "3. Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.token) {",
+									"        pm.environment.set('authToken', response.token);",
+									"    }",
+									"    if (response.userDetails && response.userDetails.id) {",
+									"        pm.environment.set('userId', response.userDetails.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"emailOrUsername\": \"juan.perez@example.com\",\n    \"password\": \"Password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"login"
+							]
+						},
+						"description": "Inicia sesión con email o username. Guarda el token automáticamente."
+					},
+					"response": []
+				},
+				{
+					"name": "4. Resend Verification Email",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"juan.perez@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/resend-verification",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"resend-verification"
+							]
+						},
+						"description": "Reenvía el email de verificación si no llegó la primera vez."
+					},
+					"response": []
+				},
+				{
+					"name": "5. Forgot Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"juan.perez@example.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/forgot-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"forgot-password"
+							]
+						},
+						"description": "Solicita un token para resetear contraseña. Se envía por email."
+					},
+					"response": []
+				},
+				{
+					"name": "6. Reset Password",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"PASTE_RESET_TOKEN_HERE\",\n    \"newPassword\": \"NewPassword456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/reset-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"reset-password"
+							]
+						},
+						"description": "Resetea la contraseña usando el token recibido por email."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de autenticación: registro, login, verificación de email, recuperación de contraseña."
+		},
+		{
+			"name": "Profile",
+			"item": [
+				{
+					"name": "1. Get My Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/auth/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"profile"
+							]
+						},
+						"description": "Obtiene el perfil del usuario autenticado."
+					},
+					"response": []
+				},
+				{
+					"name": "2. Get Profile By ID",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": \"{{userId}}\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/profile/by-id",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"profile",
+								"by-id"
+							]
+						},
+						"description": "Obtiene el perfil de un usuario por su ID (sin autenticación)."
+					},
+					"response": []
+				},
+				{
+					"name": "3. Update Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Juan Carlos",
+									"type": "text"
+								},
+								{
+									"key": "surname",
+									"value": "Pérez García",
+									"type": "text"
+								},
+								{
+									"key": "username",
+									"value": "juancperez",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "87654321",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/profile",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"profile"
+							]
+						},
+						"description": "Actualiza el perfil del usuario autenticado. Todos los campos son opcionales."
+					},
+					"response": []
+				},
+				{
+					"name": "4. Change Password",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"currentPassword\": \"Password123\",\n    \"newPassword\": \"NewPassword456\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/change-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"auth",
+								"change-password"
+							]
+						},
+						"description": "Cambia la contraseña del usuario autenticado. Requiere la contraseña actual."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de perfil: obtener, actualizar datos y cambiar contraseña."
+		},
+		{
+			"name": "Posts",
+			"item": [
+				{
+					"name": "1. Create Post",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data._id) {",
+									"        pm.environment.set('postId', response.data._id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Mi primera publicación\",\n    \"category\": \"General\",\n    \"content\": \"Este es el contenido de mi primera publicación. Aquí puedo escribir hasta 5000 caracteres sobre el tema que quiera compartir con la comunidad.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/posts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts"
+							]
+						},
+						"description": "Crea una nueva publicación. Requiere autenticación. Guarda el postId automáticamente."
+					},
+					"response": []
+				},
+				{
+					"name": "2. Get All Posts",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts"
+							]
+						},
+						"description": "Obtiene todas las publicaciones ordenadas por fecha (más recientes primero)."
+					},
+					"response": []
+				},
+				{
+					"name": "3. Get Post By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts/{{postId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"{{postId}}"
+							]
+						},
+						"description": "Obtiene una publicación específica por su ID."
+					},
+					"response": []
+				},
+				{
+					"name": "4. Update Post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Mi primera publicación (actualizada)\",\n    \"content\": \"He actualizado el contenido de mi publicación con información más detallada y relevante.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/posts/{{postId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"{{postId}}"
+							]
+						},
+						"description": "Actualiza una publicación. Solo el autor puede editarla. Todos los campos son opcionales."
+					},
+					"response": []
+				},
+				{
+					"name": "5. Delete Post",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/posts/{{postId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"posts",
+								"{{postId}}"
+							]
+						},
+						"description": "Elimina una publicación y todos sus comentarios. Solo el autor puede eliminarla."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de publicaciones: crear, listar, obtener, actualizar y eliminar."
+		},
+		{
+			"name": "Comments",
+			"item": [
+				{
+					"name": "1. Create Comment",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    const response = pm.response.json();",
+									"    if (response.data && response.data._id) {",
+									"        pm.environment.set('commentId', response.data._id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"postId\": \"{{postId}}\",\n    \"content\": \"Excelente publicación, muy interesante el tema que compartiste.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/comments",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"comments"
+							]
+						},
+						"description": "Crea un comentario en una publicación. Requiere autenticación. Guarda el commentId."
+					},
+					"response": []
+				},
+				{
+					"name": "2. Get Comments By Post",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/comments/post/{{postId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"comments",
+								"post",
+								"{{postId}}"
+							]
+						},
+						"description": "Obtiene todos los comentarios de una publicación ordenados por fecha."
+					},
+					"response": []
+				},
+				{
+					"name": "3. Update Comment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"content\": \"He actualizado mi comentario para agregar más detalles sobre mi opinión.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/comments/{{commentId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"comments",
+								"{{commentId}}"
+							]
+						},
+						"description": "Actualiza un comentario. Solo el autor puede editarlo."
+					},
+					"response": []
+				},
+				{
+					"name": "4. Delete Comment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{authToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/comments/{{commentId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"comments",
+								"{{commentId}}"
+							]
+						},
+						"description": "Elimina un comentario. Solo el autor puede eliminarlo."
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints de comentarios: crear, listar por post, actualizar y eliminar."
+		},
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/health",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"health"
+					]
+				},
+				"description": "Verifica que el servidor esté funcionando correctamente."
+			},
+			"response": []
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:3000/api/v1",
+			"type": "string"
+		}
+	]
+}
